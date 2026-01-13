@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login Page</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Poppins,sans-serif;
+}
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#667eea,#764ba2,#f093fb);
+}
+.login-card{
+  width:360px;
+  padding:30px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(12px);
+  color:#fff;
+}
+.login-card h2{
+  text-align:center;
+  margin-bottom:20px;
+}
+.input-box{
+  margin-bottom:15px;
+  position:relative;
+}
+.input-box input{
+  width:100%;
+  padding:12px 40px 12px 12px;
+  border-radius:8px;
+  border:none;
+  outline:none;
+}
+.eye{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+  font-size:18px;
+  color:#333;
+}
+.error{
+  font-size:13px;
+  color:#ffda79;
+}
+.login-btn{
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  border:none;
+  background:#fad0c4;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:10px;
+}
+.links{
+  display:flex;
+  justify-content:space-between;
+  margin-top:12px;
+  font-size:14px;
+}
+.links a{
+  color:#fff;
+  text-decoration:none;
+}
+.links a:hover{
+  text-decoration:underline;
+}
+.success{
+  margin-top:15px;
+  text-align:center;
+  color:#c3ffb0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-card">
+<h2>Welcome Back</h2>
+
+<form id="loginForm">
+
+  <div class="input-box">
+    <input type="email" id="email" placeholder="Email" required>
+    <div class="error" id="emailError"></div>
+  </div>
+
+  <div class="input-box">
+    <input type="password" id="password" placeholder="Password" required>
+    <span class="eye" id="togglePassword">👁</span>
+    <div class="error" id="passwordError"></div>
+  </div>
+
+  <button class="login-btn">Login</button>
+
+  <div class="links">
+    <a href="#" id="forgotPassword">Forgot Password?</a>
+    <a href="signup.html">Create New Account</a>
+  </div>
+
+  <div class="success" id="successMsg"></div>
+  <div class="error" id="errorMsg"></div>
+
+</form>
+</div>
+
+<!-- 🔥 FIREBASE + LOGIN LOGIC -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBQE-UJCKXzaEgPcQ3RG7gXsIbwOh_1ihg",
+  authDomain: "login-page-2fd7b.firebaseapp.com",
+  projectId: "login-page-2fd7b",
+  storageBucket: "login-page-2fd7b.appspot.com",
+  messagingSenderId: "948958515984",
+  appId: "1:948958515984:web:74e9d709b1cbc95c200b95"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+/* 👁 Show / Hide Password */
+const togglePassword = document.getElementById("togglePassword");
+const passwordInput = document.getElementById("password");
+
+togglePassword.addEventListener("click", () => {
+  const type = passwordInput.type === "password" ? "text" : "password";
+  passwordInput.type = type;
+  togglePassword.textContent = type === "password" ? "👁" : "🙈";
+});
+
+/* 🔐 LOGIN */
+document.getElementById("loginForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  emailError.textContent = "";
+  passwordError.textContent = "";
+  errorMsg.textContent = "";
+  successMsg.textContent = "";
+
+  if (email.length < 17) {
+    emailError.textContent = "Email must be at least 17 characters";
+    return;
+  }
+
+  if (password.length < 8) {
+    passwordError.textContent = "Password must be at least 8 characters";
+    return;
+  }
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      successMsg.textContent = "Login Successful ✅";
+    })
+    .catch((error) => {
+      errorMsg.textContent = error.message;
+    });
+});
+
+/* 🔑 FORGOT PASSWORD */
+document.getElementById("forgotPassword").addEventListener("click", () => {
+  const email = document.getElementById("email").value.trim();
+  if (!email) {
+    alert("Please enter your email first");
+    return;
+  }
+  sendPasswordResetEmail(auth, email)
+    .then(() => {
+      alert("Password reset email sent 📩");
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+});
+</script>
+
+</body>
+</html>
